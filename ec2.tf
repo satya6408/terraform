@@ -63,7 +63,8 @@ resource "aws_instance" "my_instance" {
 
   instance_type = var.ec2_instance_type
   ami           = var.ec2_ami_id
-  user_data     = file("${path.module}/install_Nginx.sh")
+  # user_data     = file("${path.module}/install_Nginx.sh")
+  user_data = file("${path.module}/install_Docker.sh")
 
   root_block_device {
     volume_size = var.ec2_root_staorage_size
