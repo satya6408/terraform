@@ -58,14 +58,15 @@ resource "aws_security_group" "my_security_group" {
 
 # EC2 Instance
 resource "aws_instance" "my_instance" {
-  key_name        = aws_key_pair.my_key.key_name
+  key_name               = aws_key_pair.my_key.key_name
   vpc_security_group_ids = [aws_security_group.my_security_group.id]
 
-  instance_type = "t3.micro"
-  ami           = "ami-0532913178263be11"
+  instance_type = var.ec2_instance_type
+  ami           = var.ec2_ami_id
+  user_data     = file("${path.module}/install_Nginx.sh")
 
   root_block_device {
-    volume_size = 15
+    volume_size = var.ec2_root_staorage_size
     volume_type = "gp3"
   }
 
