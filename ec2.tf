@@ -2,12 +2,11 @@
 # AWS Key Pair Login
 resource "aws_key_pair" "my_key" {
   key_name   = "terra-key-ec2"
-  public_key = file("terra-key-ec2.pub")
+  public_key = file("${path.module}/terra-key-ec2.pub")
 }
 
 # Default VPC
-resource "aws_default_vpc" "default" {
-}
+resource "aws_default_vpc" "default" {}
 
 # Security Group
 resource "aws_security_group" "my_security_group" {
@@ -15,7 +14,7 @@ resource "aws_security_group" "my_security_group" {
   description = "Terraform generated security group"
   vpc_id      = aws_default_vpc.default.id
 
-  # Inbound: SSH
+  # SSH
   ingress {
     from_port   = 22
     to_port     = 22
@@ -24,7 +23,7 @@ resource "aws_security_group" "my_security_group" {
     description = "SSH access"
   }
 
-  # Inbound: HTTP
+  # HTTP
   ingress {
     from_port   = 80
     to_port     = 80
@@ -33,7 +32,7 @@ resource "aws_security_group" "my_security_group" {
     description = "HTTP access"
   }
 
-  # Inbound: Application
+  # Application
   ingress {
     from_port   = 8000
     to_port     = 8000
@@ -42,7 +41,7 @@ resource "aws_security_group" "my_security_group" {
     description = "Application port 8000"
   }
 
-  # Outbound rules
+  # Outbound
   egress {
     from_port   = 0
     to_port     = 0
@@ -56,19 +55,19 @@ resource "aws_security_group" "my_security_group" {
   }
 }
 
-# EC2 Instance
-
+# Create Two EC2 Instances
 resource "aws_instance" "my_instance" {
-
-  count = 2 #meta variable
+  for_each = tomap({
+    first_terraform_automate_micro  = "t3.micro"
+    first_terraform_automate_medium = "t3.small"
+  })
 
   key_name               = aws_key_pair.my_key.key_name
   vpc_security_group_ids = [aws_security_group.my_security_group.id]
 
-  instance_type = var.ec2_instance_type
+  instance_type = each.value
   ami           = var.ec2_ami_id
   user_data     = file("${path.module}/install_Nginx.sh")
-  #user_data    = file("${path.module}/install_Docker.sh")
 
   root_block_device {
     volume_size = var.ec2_root_staorage_size
@@ -76,6 +75,6 @@ resource "aws_instance" "my_instance" {
   }
 
   tags = {
-    Name = "first terraform automate"
+    Name = each.key
   }
 }
