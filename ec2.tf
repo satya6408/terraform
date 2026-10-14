@@ -57,14 +57,18 @@ resource "aws_security_group" "my_security_group" {
 }
 
 # EC2 Instance
+
 resource "aws_instance" "my_instance" {
+
+  count = 2 #meta variable
+
   key_name               = aws_key_pair.my_key.key_name
   vpc_security_group_ids = [aws_security_group.my_security_group.id]
 
   instance_type = var.ec2_instance_type
   ami           = var.ec2_ami_id
-  # user_data     = file("${path.module}/install_Nginx.sh")
-  user_data = file("${path.module}/install_Docker.sh")
+  user_data     = file("${path.module}/install_Nginx.sh")
+  #user_data    = file("${path.module}/install_Docker.sh")
 
   root_block_device {
     volume_size = var.ec2_root_staorage_size
