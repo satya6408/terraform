@@ -62,6 +62,8 @@ resource "aws_instance" "my_instance" {
     first_terraform_automate_medium = "t3.small"
   })
 
+  depends_on = [aws_security_group.my_security_group ,aws_key_pair.my_key]
+
   key_name               = aws_key_pair.my_key.key_name
   vpc_security_group_ids = [aws_security_group.my_security_group.id]
 
