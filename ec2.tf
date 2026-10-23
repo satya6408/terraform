@@ -59,7 +59,6 @@ resource "aws_security_group" "my_security_group" {
 resource "aws_instance" "my_instance" {
   for_each = tomap({
     first_terraform_automate_micro  = "t3.micro"
-    first_terraform_automate_small  = "t3.small"
     first_terraform_automate_medium = "t3.small"
   })
 
@@ -73,7 +72,7 @@ resource "aws_instance" "my_instance" {
   user_data     = file("${path.module}/install_Nginx.sh")
 
   root_block_device {
-    volume_size = var.env == "prod" ? 20 : var.ec2_default_root_staorage_size
+    volume_size = var.env == "prod" ? 15 : var.ec2_default_root_staorage_size
     volume_type = "gp3"
   }
 
