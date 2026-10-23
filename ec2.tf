@@ -59,10 +59,11 @@ resource "aws_security_group" "my_security_group" {
 resource "aws_instance" "my_instance" {
   for_each = tomap({
     first_terraform_automate_micro  = "t3.micro"
+    first_terraform_automate_small  = "t3.small"
     first_terraform_automate_medium = "t3.small"
   })
 
-  depends_on = [aws_security_group.my_security_group ,aws_key_pair.my_key]
+  depends_on = [aws_security_group.my_security_group, aws_key_pair.my_key]
 
   key_name               = aws_key_pair.my_key.key_name
   vpc_security_group_ids = [aws_security_group.my_security_group.id]
@@ -72,11 +73,16 @@ resource "aws_instance" "my_instance" {
   user_data     = file("${path.module}/install_Nginx.sh")
 
   root_block_device {
-    volume_size = var.ec2_root_staorage_size
+    volume_size = var.env == "prod" ? 20 : var.ec2_default_root_staorage_size
     volume_type = "gp3"
   }
 
   tags = {
     Name = each.key
   }
+}
+
+resource "aws_instance" "my_new_instance" {
+  ami           = "ami-0080f2c6aa4e378b7"
+  instance_type = "t3.micro"
 }
